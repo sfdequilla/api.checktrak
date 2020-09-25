@@ -8,6 +8,7 @@ use App\Access;
 use App\Action;
 use App\Branch;
 use App\Module;
+use App\Report;
 use App\Status;
 use App\Company;
 use Carbon\Carbon;
@@ -79,12 +80,21 @@ class ToolController extends Controller
 
     public function access()
     {
-        return Access::with('actions')->with('groups')->with('modules')->get();
+        return Access::with('actions')
+            ->with('groups')
+            ->with('modules')
+            ->with('reports')
+            ->get();
     }
 
     public function modules()
     {
         return Module::get();
+    }
+
+    public function reports()
+    {
+        return Report::get();
     }
 
     public function payees(Request $request, Company $company)
@@ -193,5 +203,18 @@ class ToolController extends Controller
             ->orderBy('id', 'desc')
             ->take(10)
             ->get();
+    }
+
+    public function masterlistReport(Company $company)
+    {
+        return  [
+            'accounts' =>  $company->accounts()->where('active', 1)->get(),
+            'payees' => $company->payees()->take(10)->get(),
+            'transmittals' => $company->transmittals()->take(10)->get(),
+            'status' => Status::get(),
+            'branches' => Branch::where('active', 1)->get(),
+            'groups' => Group::where('active', 1)->get(),
+            'users' => User::where('active', 1)->get(),
+        ];
     }
 }

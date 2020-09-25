@@ -1,5 +1,5 @@
 <?php
-Route::get('/test/{check}', 'TestController@index');
+// Route::get('/test/{check}', 'TestController@index');
 
 Route::middleware('csrf')->group( function() {
     Route::get('/', function () {
@@ -15,8 +15,12 @@ Route::middleware('csrf')->group( function() {
     ]);
 });
 
-Route::prefix('/export')->group( function() {
+Route::prefix('/{company}/export')->middleware('checkUiRequest')->group( function() {
     Route::post('/transmittal', 'ExportController@transmittal');
 
-    Route::post('/check', 'ExportController@check')->middleware('checkUiRequest');
+    Route::post('/check', 'ExportController@check');
+});
+
+Route::prefix('/{company}/report')->middleware('checkUiRequest')->group( function() {
+    Route::post('/masterlist', 'ReportController@generateMasterlist')->middleware('checkUiRequest');
 });
